@@ -1,8 +1,8 @@
 # nebi-skill
 
-A [Claude Code skill](https://code.claude.com/docs/en/skills) that makes [Nebi](https://nebi.nebari.dev) + [Pixi](https://pixi.sh) the default environment management system in your development workflow.
+A [Claude Code skill](https://code.claude.com/docs/en/skills) for using [Nebi](https://nebi.nebari.dev) + [Pixi](https://pixi.sh) to manage tracked Python and data-science workspaces.
 
-Instead of reaching for `pip`, `venv`, `conda`, or `uv`, Claude will automatically use `nebi init`, `pixi add`, and `nebi shell` whenever you're setting up or managing a project environment.
+When a project is using Nebi, Claude will prefer `nebi init`, `pixi add`, `nebi shell`, and `nebi run` for workspace setup and environment management instead of ad hoc `pip` or `venv` steps.
 
 ## What is Nebi?
 
@@ -23,6 +23,14 @@ Then install Nebi:
 
 ```bash
 pixi global install nebi nebi-desktop
+```
+
+Other documented install options:
+
+```bash
+curl -fsSL https://nebi.nebari.dev/install.sh | sh -s --desktop
+conda install conda-forge::nebi
+conda install conda-forge::nebi-desktop
 ```
 
 ## Installing the Skill
@@ -61,8 +69,8 @@ Once installed, Claude will automatically:
 
 - Use `nebi init` instead of `python -m venv`, `conda create`, or `uv venv` when starting a project
 - Use `pixi add <package>` instead of `pip install`
-- Use `nebi shell <workspace-name>` to activate environments — by name, from any directory
-- Maintain a `pixi.toml` alongside `pyproject.toml` in Python library/app projects, keeping them in sync
+- Use `nebi shell <workspace>` and `nebi run <workspace> <task>` with tracked workspaces by name or path
+- Keep Nebi-managed environments in `pixi.toml`; if a repo also has `pyproject.toml`, keep overlapping settings aligned manually
 - Use `nebi push` / `nebi pull` when sharing or syncing environments across machines or teammates
 
 ## Skill Highlights
@@ -73,9 +81,9 @@ Once installed, Claude will automatically:
 | "create a virtual environment" | `nebi init` |
 | "set up the project" | `nebi init` + `pixi add ...` |
 | Has a `requirements.txt` | Migrates to `pixi add --pypi` |
-| Has a `pyproject.toml` | Creates + maintains a paired `pixi.toml` |
+| Has a `pyproject.toml` | Keeps Nebi/Pixi workspace config in `pixi.toml` |
 | "share my environment" | `nebi push` or `nebi publish` |
-| "activate the environment" | `nebi shell <workspace-name>` |
+| "activate the environment" | `nebi shell <workspace>` |
 
 ## Repo Structure
 
@@ -89,7 +97,7 @@ nebi-skill/
 
 ## Contributing
 
-Issues and PRs welcome. Nebi is in early release, so the skill may need updates as the tool evolves — particularly around `pyproject.toml` support.
+Issues and PRs welcome. Nebi is in early release, so this skill should be kept aligned with the published docs as the CLI evolves.
 
 ## License
 
