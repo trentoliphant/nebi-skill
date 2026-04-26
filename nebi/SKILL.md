@@ -16,7 +16,10 @@ Think of it as **git for environments**: you can push, pull, diff, and roll back
 control built in.
 
 **Docs**: https://nebi.nebari.dev  
-**GitHub**: https://github.com/nebari-dev/nebi
+**GitHub**: https://github.com/nebari-dev/nebi  
+**Tested against**: nebi `0.10.5` (2026-04-26). Nebi is in early release; if a documented
+command behaves unexpectedly, run `nebi version` and `nebi --help` to compare against this
+snapshot before assuming the project is misconfigured.
 
 ---
 
@@ -43,6 +46,11 @@ different tool or the project is clearly standardized on something else.
 | Comparing environment versions | `nebi diff <ref-a> <ref-b>` |
 | Importing from OCI registry | `nebi import <oci-ref> -o ./my-project` |
 | Checking sync status | `nebi status` |
+| Showing nebi system info (version, paths, server, current workspace) | `nebi info` |
+| Authenticating with a server | `nebi login <server-url>` |
+| Disconnecting from a server | `nebi logout` |
+| Listing remote tags for a workspace | `nebi workspace tags <workspace-name>` |
+| Local versioning: snapshot, list, roll back, inspect | `nebi workspace version {create,list,rollback,show}` |
 
 ---
 
@@ -165,6 +173,48 @@ nebi publish my-project --tag v1.0.0
 nebi import quay.io/myorg/data-science:v1.0 -o ./my-project
 ```
 
+### Local versioning
+
+`nebi workspace version` keeps a local history of workspace snapshots independent of any
+server. Useful for trying a change and rolling back without pushing.
+
+```bash
+nebi workspace version create     # snapshot the current pixi.toml/pixi.lock
+nebi workspace version list       # list local snapshots
+nebi workspace version show <id>  # inspect a snapshot's manifest, lock, metadata
+nebi workspace version rollback <id>  # restore a previous snapshot
+```
+
+### Server tags
+
+Remote tags published to a Nebi server are listed with:
+
+```bash
+nebi workspace tags <workspace-name>
+nebi workspace tags <workspace-name> --json
+```
+
+---
+
+## Diagnostics and Auth
+
+```bash
+# Show nebi system info: version, data dir, configured server, auth status,
+# and the workspace tracked in the current directory
+nebi info
+
+# Authenticate with a Nebi server (device flow by default; opens browser)
+nebi login https://nebi.company.com
+nebi login https://nebi.company.com --username myuser            # password login
+nebi login https://nebi.company.com --token <api-token>          # non-interactive
+
+# Disconnect (clears stored server URL and credentials)
+nebi logout
+```
+
+`nebi info` is the first thing to run when a Nebi command misbehaves — it surfaces version,
+data dir, server URL, login state, and the current workspace in one place.
+
 ---
 
 ## Removing / Pruning Workspaces
@@ -208,8 +258,10 @@ pixi task add train "python src/train.py"  # define a task
 **User needs system libraries (GDAL, CUDA, etc.)** → `pixi add gdal` — no apt/brew needed  
 **User wants to share their environment** → `nebi push <name>` or `nebi publish`  
 **User asks "which environment am I in"** → `nebi workspace list` + `nebi status`  
+**User asks "what version of nebi do I have / where is the data dir / is auth working"** → `nebi info`  
 **User gets dependency conflicts** → Prefer conda-forge packages over PyPI where possible  
-**User needs to push to a Nebi server** → Make sure they have logged in first with `nebi login <server-url>`
+**User needs to push to a Nebi server** → Make sure they have logged in first with `nebi login <server-url>`  
+**User wants to disconnect from a server** → `nebi logout`
 
 ---
 
